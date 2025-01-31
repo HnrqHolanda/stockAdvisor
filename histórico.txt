@@ -1,0 +1,63 @@
+Quando eu li o projeto eu achei que seria mais fácil, porém deu um trabalho considerável
+e a solução não ficou 100%, mas vou comentar um pouco sobre o que aconteceu.
+
+Inicialmente a primeira pergunta que eu quis responder foi como eu ia guardar os dados pra mostrar tudo isso.
+ai eu vi que para cada ativo eu teria que ter 3 informações Linf, Lsup, Tempo + cotações associadas ao seu respectivo horário.
+então um dicionário por ativo fazia sentido, ja que eu precisava de algo que guardasse valores associados.
+
+Ai para diferenciar os usuários eu teria um dicionário para cada usuário, e esse dicionário 
+como tem que guardar informações sobre diferentes ativos ele seria um dict de varios dicts 
+então basicamente os dados são armazenados dessa forma:
+
+Dicionario do usuario Henrique_123:{"HAPV3: {"Linf": 2, "Lsup":4, "Tempo":1, "2025-01-31 11:35": "2,45"}}
+
+Depois disso eu vi uns videos no youtube de como fazer autenticação no django, fiz o login, cadastro
+e ajeitei para que toda vez que um usuário fosse criado ele tivesse um dicionário associado a ele.
+
+Posteriormente eu pensei no menu com as funcionalidades em 3 partes
+
+Registros.html
+Basicamente le o user_dict e plota um gráfico para cada ativo no próprio JS.
+
+Opções.html
+Lista os ativos a partir de um CSV que eu peguei de um site(Dados de mercado)
+e basicamente tem 3 tipos de POST que saem a partir dessa página:
+
+Ao desmarcar a checkbox, ele apaga o dict do ativo no user_dict
+Ao marcar a checkbox com as infos preenchidas ele cria o dict do ativo no user_dict
+Ao mudar o valor de um input com a checkbox marcada ele da update    
+Assim o usuário consegue escolher oq quer monitorar e passa os parametros necessários                
+(Essa lógica está no script do opções.html)
+
+Monitoramento.html
+Pagina que atualiza a cada 60s e exibe a ultima cotação com a recomendação respectiva
+
+/-----------------------------------------------------------------------------/
+
+Eu iniciei pelo opções.html, pois eu já queria ir testando a função de pegar a cotação rodando em segundo plano a partir 
+do momento que o user desse o check em uma checkbox.
+
+A função de pegar a cotação foi fácil de fazer, é um scrap da yahoo finance, mas fazer ela rodar em 2° plano 
+foi a maior dificuldade do projeto.
+
+tentei fazer no JS e não deu pois o JS tem a desvantagem de que 
+quando eu trocava de pagina ele morre o script que tava rodando
+(parece que o JS tem uma alternativa para isso, mas eu não desenrolei e tentei ajeitar isso no python msm)
+
+tentei com o celery e não deu certo também.
+
+no fim eu fiz usando threads mas o chat GPT já me falou que fazer por Threads não era uma solução boa,
+então eu imagino que não foi a melhor saída, mas foi oq eu consegui
+
+Depois que o opções terminou, eu fiz o monitoramento e o registros. 
+
+Acrescentei também para as threads comecarem no momento do login e não só nos POSTs do opções.html
+(se o usuario já tem dados salvos no dicionario, assim que ele fizer login já vai começar a rodar as funções de busca)
+
+Depois que as paginas foram feitas, os POSTs e as Threads estavam ""funcionando", eu dei uma última olhada no código,
+adicionei umas verificações no JS, ajeitei para a função de pegar a cotação enviar o email assim que visse a desigualdade
+e decidi enviar o projeto.
+
+Ficarei muito grato em receber algum feedback :)
+Desde já, obrigado pelo tempo e atenção.
+
