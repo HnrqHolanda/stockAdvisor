@@ -1,0 +1,57 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockAdvisor</title>
+
+    <link rel="icon" href="{% static 'images/favicon.jpeg' %}" type="image/x-icon">
+    
+    <link rel="stylesheet" href="{% static 'styles/styles_cadastro.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="Container">
+        <h2>Login</h2>
+            <form action="{% url 'cadastro' %}" method="POST">
+                {% csrf_token %}
+                <div class="labeldiv">
+                    <label>Nome de Usuário:</label>
+                </div>
+                <input type="text" id="username" name="username" required placeholder="Digite seu nome de Usuário">
+                <div class="labeldiv">
+                    <label>Email:</label>
+                </div>
+                <input type="email" id="email" name="email" required placeholder="Digite seu email">
+                <div class="labeldiv">
+                    <label>Senha:</label>
+                </div>
+                <input type="password" id="password" name="password" required placeholder="Digite sua senha">
+                <div class="labeldiv">
+                    <label>Confirme sua senha:</label>
+                </div>
+                <input type="password" id="password" name="password2" required placeholder="Confirme sua senha">
+                {% if messages %}
+                    <div>
+                        {% for message in messages %}
+                            <div class="alert">
+                                <p>{{ message }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="btn-div">
+                    <button type="submit">Cadastrar</button>
+                </div>
+            </form>
+            <a href="/auth/login" style="text-decoration: none;">
+                <h3>Realizar Login</h3> 
+            </a>       
+        </div>
+    </div>
+</body>
+</html>

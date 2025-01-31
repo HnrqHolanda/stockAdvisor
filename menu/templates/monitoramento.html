@@ -1,0 +1,115 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockAdvisor</title>
+
+    <link rel="icon" href="{% static 'images/favicon.jpeg' %}" type="image/x-icon">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <link rel="stylesheet" href="{% static 'styles/styles_menu.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/styles_monit_block.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Seleciona todos os elementos da recomendação
+        var recomendacoes = document.querySelectorAll(".rows_item2");
+
+        recomendacoes.forEach(function(elemento) {
+            var texto = elemento.textContent.trim();
+
+            if (texto === "Vender") {
+                elemento.style.color = "green";
+            } else if (texto === "Manter") {
+                elemento.style.color = "blue";
+            } else if (texto === "Comprar") {
+                elemento.style.color = "red";
+            }
+        });
+    });
+</script>
+
+<body>
+    <div class="Container">
+        <div class="DashBoard">
+            <h1>Monitoramento</h1>
+
+            {% block content %}
+                <div class="MonitDashboard">
+                    <h2>Ativos Monitorados:</h2>
+                    <div class="StockList">
+                        {% if ativos %}
+                                    <div class="headline">
+                                        <h3>Ticker</h3>
+                                        <h3>Limite Inferior</h3>
+                                        <h3>Limite Superior</h3>
+                                        <h3>Ultima Cotação</h3>
+                                        <h3>Obtida em</h3>
+                                        <h3>Recomendação</h3>
+                                    </div>
+                                    {% for ativo in ativos %}
+                                        <div class="rows">
+                                                <p class="rows_item" style="margin-right: 3.5vw;">{{ ativo.codigo }}</p> 
+                                                <p class="rows_item" style="margin-right: 5vw;">R${{ ativo.Linf }}</p> 
+                                                <p class="rows_item" style="margin-right: 3vw;">R${{ ativo.Lsup }}</p> 
+                                                <p class="rows_item" style="min-width: 90px; max-width: 90px;"> Valor: R${{ ativo.ultima_cotacao }}</p>
+                                                <div class="rows_item" style="min-width: 120px; max-width: 120px;">
+                                                    <p>Data: {{ ativo.ultima_data }}</p>
+                                                    <p>Horário: {{ativo.ultimo_horario}}</p>
+                                                </div>
+                                                <p class="rows_item2">{{ativo.Recomendação}}</p>
+                                        </div>
+                                    {% endfor %}
+                            {% else %}
+                                <div class="alert">
+                                    <p>Você não está monitorando nenhum ativo no momento :(</p>
+                                    <p>Vá em opções e escolha alguns ativos para monitorar</p>
+                                </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <p style="text-align: left; width: 90%;">1. A pagina atualiza automaticamente para ver se tem atualização nas cotações</p>
+            {% endblock %}
+        </div>
+        <div class="Nav">
+            <a href = "/menu/monitoramento" style="text-decoration: none;">
+                <div class="linkdiv">
+                    Monitoramento
+                </div>
+            </a>
+            <a href = "/menu/registros" style="text-decoration: none;">
+                <div class="linkdiv">
+                    Registros
+                </div>
+            </a>
+            <a href = "/menu/opções" style="text-decoration: none;">
+                <div class="linkdiv">
+                    Opções
+                </div>
+            </a>
+            <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-div" style="color: #fb3333;">
+                  Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        setTimeout(function() {
+            location.reload();
+        }, 60000); 
+    </script>
+</body>
+</html>

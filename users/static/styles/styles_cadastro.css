@@ -1,0 +1,114 @@
+body{
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    background-color: #40cd80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+
+.Container{
+    width: 40%;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.Container h2{
+    font-family: "Roboto", serif;
+    font-size: 52px;
+    color: #40cd80;
+    margin-bottom: 15px;
+}
+
+.Container h3{
+    font-family: "Roboto", serif;
+    font-size: 20px;
+    color: #40cd80;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    margin-bottom: 70px;
+}
+
+.Container h3:hover{
+    scale: 1.1;
+}
+
+.Container form{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.labeldiv{
+    width: 60%;
+    display: flex;
+    align-items: flex-start;
+}
+
+.labeldiv label{
+    font-family: "Roboto", serif;
+    font-size: 18px;
+    color: #40cd80;
+}
+
+form input{
+    width: 60%;
+    height: 35px;
+    margin-bottom: 25px;
+    border-radius: 4px; /* Borda arredondada */
+    border: 1px solid #ddd; /* Cor da borda */
+    font-size: 16px;
+    color: #333;
+    background-color: #f9f9f9; /* Cor de fundo do input */
+    transition: all 0.3s ease; /
+}
+
+form input:focus{
+    border-color: #4a90e2; /* Cor da borda quando estiver focado */
+    background-color: #fff; /* Cor de fundo quando estiver focado */
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.5); /* Sombra suave no foco */
+    outline: none; /* Remove o contorno padrão */
+}
+
+.btn-div{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.alert{
+    font-family: "Roboto", serif;
+    font-size: 15px;
+    color: #fb3333;
+}
+
+button {
+    width: 30%; 
+    padding: 12px;
+    font-size: 14px;
+    color: white; 
+    background-color: #40cd80; 
+    border: 2px solid #40cd80; 
+    border-radius: 30px; 
+    cursor: pointer; 
+    text-transform: uppercase; 
+    font-weight: bold; 
+    transition: all 0.3s ease; 
+    margin-bottom: 12px;
+    margin-top: 6px;
+}
+
+button:hover{
+    scale: 1.1;
+}

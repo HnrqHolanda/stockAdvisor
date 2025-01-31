@@ -1,0 +1,200 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockAdvisor</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <link rel="icon" href="{% static 'images/favicon.jpeg' %}" type="image/x-icon">
+    
+    <link rel="stylesheet" href="{% static 'styles/styles_regist_block.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/styles_menu.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="Container">
+        <div class="DashBoard">
+            <h1>Registros</h1>
+            <div class="RegistDashBoard">
+                <!-- Adicionando a div de alerta -->
+
+                <div style="display: flex; align-items: center;">
+                    <h2 style="margin-right: 10px;">Registros:</h2>
+                    <select id="ativoSelect" class="select" style="display: none;">
+                        <!-- As opções serão adicionadas dinamicamente via JavaScript -->
+                    </select>
+                </div>
+
+                <div id="alerta" class="alert" style="display: none;">
+                    <p style="margin-bottom: 16px;">Você não está monitorando nenhum ativo no momento :(</p>
+                    <p>Vá em opções e escolha alguns ativos para monitorar</p>
+                </div>
+
+                <div class="grafico">
+                    <canvas id="graficoCotacoes"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="Nav">
+            <a href = "/menu/monitoramento" style="text-decoration: none;">
+                <div class="linkdiv">
+                    Monitoramento
+                </div>
+            </a>
+            <a href = "/menu/registros" style="text-decoration: none;">
+                <div class="linkdiv">
+                    Registros
+                </div>
+            </a>
+            <a href = "/menu/opções" style="text-decoration: none;">
+                <div class="linkdiv">
+                    Opções
+                </div>
+            </a>
+            <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-div" style="color: #fb3333;">
+                  Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="application/json" id="registros-data">
+        {{ registros_json|safe }}
+    </script>
+
+    <script>
+        var registros = JSON.parse(document.getElementById('registros-data').textContent);  // Converte dicionário do Django para JavaScript
+        var ctx = document.getElementById('graficoCotacoes').getContext('2d');
+        var grafico;
+
+        console.log(registros);
+
+        // Verifica se não há registros e exibe a mensagem de alerta
+        if (Object.keys(registros).length === 0) {
+            document.getElementById('alerta').style.display = 'block';  // Exibe a div de alerta
+        }
+
+        // Função para popular o select com os ativos
+        function popularSelect() {
+            var select = document.getElementById('ativoSelect');
+
+            // Limpa as opções existentes (se houver)
+            select.innerHTML = '';
+
+            // Cria as opções para o select a partir das chaves do JSON (ativos)
+            for (var ativo in registros) {
+                if (registros.hasOwnProperty(ativo)) {
+                    var option = document.createElement('option');
+                    option.value = ativo;
+                    option.textContent = ativo;
+                    select.appendChild(option);
+                }
+            }
+
+            // Verifica se o select está vazio e o oculta
+            if (select.options.length === 0) {
+                select.style.display = 'none';  // Oculta o select
+            } else {
+                select.style.display = 'block';  // Exibe o select
+                // Chama a função para gerar o gráfico com o primeiro ativo selecionado, se houver ativos
+                atualizarGrafico(select.value);
+            }
+        }
+
+        // Função para atualizar o gráfico com os dados do ativo
+        function atualizarGrafico(ativo) {
+            var dadosAtivo = registros[ativo];
+            var timestamps = [];
+            var cotacoes = [];
+            var Linf = parseFloat(dadosAtivo["Linf"]);
+            var Lsup = parseFloat(dadosAtivo["Lsup"]);
+
+            // Pegando os registros de tempo e cotação
+            for (var timestamp in dadosAtivo) {
+                // Verifica se a chave não é Linf, Lsup ou Tempo
+                if (timestamp !== "Linf" && timestamp !== "Lsup" && timestamp !== "Tempo") {
+                    timestamps.push(timestamp);
+                    cotacoes.push(parseFloat(dadosAtivo[timestamp]));
+                }
+            }
+
+            // Ordenando os timestamps (caso venham fora de ordem)
+            timestamps.sort();
+
+            // Reordenando as cotações conforme os timestamps ordenados
+            cotacoes = timestamps.map(t => parseFloat(dadosAtivo[t]));
+
+            // Se já existe um gráfico, destrói ele antes de criar outro
+            if (grafico) {
+                grafico.destroy();
+            }
+
+            // Criando o gráfico com Chart.js
+            grafico = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timestamps,  // Eixo X (tempo)
+                    datasets: [
+                        {
+                            label: 'Cotação',
+                            data: cotacoes,
+                            borderColor: 'blue',
+                            fill: false
+                        },
+                        {
+                            label: 'Linf',
+                            data: Array(timestamps.length).fill(Linf),
+                            borderColor: 'red',
+                            borderDash: [5, 5],
+                            fill: false
+                        },
+                        {
+                            label: 'Lsup',
+                            data: Array(timestamps.length).fill(Lsup),
+                            borderColor: 'green',
+                            borderDash: [5, 5],
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Tempo'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Cotação'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Ao mudar o select, atualiza o gráfico automaticamente
+        document.getElementById('ativoSelect').addEventListener('change', function() {
+            atualizarGrafico(this.value);
+        });
+
+        // Chama a função para popular o select e gerar o gráfico inicial
+        popularSelect();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,153 @@
+body{
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    background-color: 0;
+}
+
+.Container{
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 65% 35%;
+}
+
+.LogoContent{
+    width: 100%;
+    height: 100vh;
+    background-color: rgb(240, 240, 240);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.LogoContent h1{
+    font-family: "Roboto", serif;
+    text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+    font-size: 48px;
+}
+
+.box {
+    width: 250px;
+    height: 250px;
+    background-color: #40cd80;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 24px;
+    color: white;
+    font-weight: bold;
+    margin: 0 auto;
+    border-radius: 5px;
+    transform: skewY(-5deg);
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.LoginForm{
+    width: 100%;
+    height: 100vh;
+    background-color: #40cd80;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center ;
+}
+
+.LoginForm h2{
+    font-family: "Roboto", serif;
+    text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+    font-size: 48px;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.LoginForm h3{
+    font-family: "Roboto", serif;
+    text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+    font-size: 20px;
+    color: white;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    margin-bottom: 70px;
+}
+
+.LoginForm h3:hover{
+    scale: 1.1;
+}
+
+.LoginForm form{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+.labeldiv{
+    width: 60%;
+    display: flex;
+}
+
+.labeldiv label{
+    font-family: "Roboto", serif;
+    font-size: 18px;
+    color: #fff;
+}
+
+form input{
+    width: 60%;
+    height: 35px;
+    margin-bottom: 25px;
+    border-radius: 4px; /* Borda arredondada */
+    border: 1px solid #ddd; /* Cor da borda */
+    font-size: 16px;
+    color: #333;
+    background-color: #f9f9f9; /* Cor de fundo do input */
+    transition: all 0.3s ease; /
+}
+
+form input:focus{
+    border-color: #4a90e2; /* Cor da borda quando estiver focado */
+    background-color: #fff; /* Cor de fundo quando estiver focado */
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.5); /* Sombra suave no foco */
+    outline: none; /* Remove o contorno padrão */
+}
+
+.alert{
+    font-family: "Roboto", serif;
+    font-size: 15px;
+    color: #fb3333;
+}
+
+.btn-div{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    width: 30%; /* O botão vai ocupar toda a largura do seu container */
+    padding: 12px;
+    font-size: 18px;
+    color: #40cd80; /* Cor do texto do botão */
+    background-color: #fff; /* Cor de fundo branca */
+    border: 2px solid #40cd80; /* Cor da borda verde */
+    border-radius: 30px; /* Borda arredondada */
+    cursor: pointer; /* Cursor de mão para indicar que é clicável */
+    text-transform: uppercase; /* Deixar o texto em maiúsculas */
+    font-weight: bold; /* Deixar o texto em negrito */
+    transition: all 0.3s ease; /* Adiciona uma animação suave para as interações */
+    margin-bottom: 12px;
+    margin-top: 6px;
+}
+
+button:hover{
+    scale: 1.1;
+}

@@ -1,0 +1,272 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockAdvisor</title>
+
+
+    <link rel="icon" href="{% static 'images/favicon.jpeg' %}" type="image/x-icon">
+
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link rel="stylesheet" href="{% static 'styles/styles_menu.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/styles_option_block.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="Container">
+        <div class="DashBoard">
+            <h1>Opções</h1>
+
+            {% block content %}
+                <div class="OptionsDashboard">
+                    <h2>Lista de Ativos da B3:</h2>
+                        <div class="stockList">
+                            {% if ativos %}
+                                    <div class="headline">
+                                        <h3>Ticker</h3>
+                                        <h3>Nome</h3>
+                                        <h3>Limite Inferior</h3>
+                                        <h3>Limite Superior</h3>
+                                        <h3>Tempo de Checagem</h3>
+                                        <h3>Checkbox</h3>
+                                    </div>
+                                    {% for ativo in ativos %}
+                                        <div class="rows">
+                                            <form id="form_{{ ativo.ticker }}" action="{% url 'atualizar_dict_ativo' %}" method="POST" class="ajax-form">
+                                                {% csrf_token %}
+                                                <p style="margin-right: 4.7vw; min-width: 10px; max-width: 10px;" class="codigo">{{ ativo.ticker }}</p>
+                                                <p style="margin-right: 4vw; min-width: 12px; max-width: 12px;">{{ ativo.nome }}</p>
+                                                <input type="hidden" name="codigo_{{ ativo.ticker }}" id="codigo_{{ ativo.ticker }}" value="{{ ativo.ticker }}">
+                                                <input type="text" class="inputclass" id="Linf_{{ ativo.ticker }}" name="Linf_{{ ativo.ticker }}" value="{{ ativo.Linf }}" required placeholder="Limite inferior">
+                                                <input type="text" class="inputclass" id="Lsup_{{ ativo.ticker }}" name="Lsup_{{ ativo.ticker }}" value="{{ ativo.Lsup }}" required placeholder="Limite superior">
+                                                <input type="text" class="inputclass" id="Tempo_{{ ativo.ticker }}" name="Tempo_{{ ativo.ticker }}" value="{{ ativo.Tempo }}" required placeholder="Em minutos" style="margin-right: 4vw;">
+                                                {% if messages %}
+                                                    <div>
+                                                        {% for message in messages %}
+                                                            <div class="alert">
+                                                                <p>{{ message }}</p>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <input type="checkbox" class="checkboxcustom" data-ativo="{{ ativo.ticker }}" id="checkbox_{{ ativo.ticker }}" {{ ativo.checked }} style="margin-right: 3.6vw;">
+                                                </div>
+                                            </form>
+                                        </div>
+                                    {% endfor %}
+
+                            {% else %}
+                                <div class="alert">
+                                    <p>Nenhum ativo disponível no momento :(</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                </div>
+            {% endblock %}
+            <div style="width: 90%; text-align: start;">
+                <p>1. Para monitorar um ativo, preencha o limite superior, limite inferior e pressione a checkbox.</p>
+                <p>2. Ao desmarcar a checkbox, você também apaga os seus registros daquele ativo.</p>
+            </div>
+        </div>
+        <div class="Nav">
+            <a href = "/menu/monitoramento" style="text-decoration: none;">
+                <div class="linkdiv">
+                    Monitoramento
+                </div>
+            </a>
+            <a href = "/menu/registros" style="text-decoration: none;">
+                <div class="linkdiv">
+                    Registros
+                </div>
+            </a>
+            <a href = "/menu/opções" style="text-decoration: none;">
+                <div class="linkdiv">
+                    Opções
+                </div>
+            </a>
+            <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-div" style="color: #fb3333;">
+                  Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('input[type="checkbox"]').change(function() {
+                var acao = $(this).prop('checked') ? 'adicionar' : 'remover';  
+                var ativoTicker = $(this).attr('id').split('_')[1];  
+    
+                var codigo = $("#codigo_" + ativoTicker).val();  
+                var Linf = $("#Linf_" + ativoTicker).val().trim();  
+                var Lsup = $("#Lsup_" + ativoTicker).val().trim();  
+                var Tempo = $("#Tempo_" + ativoTicker).val().trim();
+    
+                // Validação de Linf e Lsup (inteiro ou decimal com até 2 casas)
+                var decimalRegex = /^\d+(\.\d{1,2})?$/;
+                if (!decimalRegex.test(Linf) || !decimalRegex.test(Lsup)) {
+                    alert("Os limites devem ser números inteiros ou decimais com até 2 casas decimais.");
+                    $(this).prop('checked', false);
+                    return;
+                }
+    
+                // Garantir que Lsup > Linf
+                if (parseFloat(Lsup) <= parseFloat(Linf)) {
+                    alert("O Limite Superior deve ser maior que o Limite Inferior.");
+                    $(this).prop('checked', false);
+                    return;
+                }
+    
+                // Validação de Tempo (inteiro ≥ 1)
+                var tempoInt = parseInt(Tempo, 10);
+                if (isNaN(tempoInt) || tempoInt < 1) {
+                    alert("O Tempo deve ser um número inteiro maior ou igual a 1.");
+                    $(this).prop('checked', false);
+                    return;
+                }
+    
+                // Enviar requisição AJAX
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "atualizar_dict_ativo" %}',
+                    data: {
+                        'acao': acao,
+                        'Linf': Linf,
+                        'Lsup': Lsup,
+                        'codigo': codigo,
+                        'Tempo': Tempo,
+                        'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            console.log('Ação realizada com sucesso:', response.acao, response.ativo);
+                        }
+                    },
+                    error: function() {
+                        alert("Erro ao atualizar o dicionário.");
+                    }
+                });
+            });
+    
+            // Restringir inputs Linf e Lsup para números válidos
+            $(".Linf, .Lsup").on("input", function() {
+                this.value = this.value.replace(/[^0-9.]/g, "");
+                if ((this.value.match(/\./g) || []).length > 1) {
+                    this.value = this.value.substring(0, this.value.length - 1);
+                }
+                this.value = this.value.replace(/^(\d+\.?\d{0,2}).*$/, "$1");
+            });
+    
+            // Restringir input Tempo para números inteiros ≥ 1
+            $(".Tempo").on("input", function() {
+                this.value = this.value.replace(/\D/g, "");
+                if (this.value < 1) {
+                    this.value = "1";
+                }
+            });
+        });
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    
+            function isCheckboxChecked(ativoTicker) {
+                var checkbox = document.getElementById('checkbox_' + ativoTicker);
+                return checkbox ? checkbox.checked : false;
+            }
+    
+            function enviarDados(ativoTicker) {
+                console.log(`📤 Enviando dados para: ${ativoTicker}`);
+    
+                var form = document.getElementById('form_' + ativoTicker);
+                if (!form) {
+                    console.error("❌ Formulário não encontrado para:", ativoTicker);
+                    return;
+                }
+    
+                var Linf = document.getElementById('Linf_' + ativoTicker);
+                var Lsup = document.getElementById('Lsup_' + ativoTicker);
+                var Tempo = document.getElementById("Tempo_" + ativoTicker);
+    
+                if (!Linf || !Lsup || !Tempo) {
+                    console.error("❌ Inputs não encontrados para:", ativoTicker);
+                    return;
+                }
+    
+                var csrfToken = form.querySelector('[name=csrfmiddlewaretoken]');
+                if (!csrfToken) {
+                    console.error("❌ CSRF Token não encontrado!");
+                    return;
+                }
+    
+                // Validação de Linf e Lsup
+                var decimalRegex = /^\d+(\.\d{1,2})?$/;
+                if (!decimalRegex.test(Linf.value) || !decimalRegex.test(Lsup.value)) {
+                    alert("Os limites devem ser números inteiros ou decimais com até 2 casas decimais.");
+                    document.getElementById('checkbox_' + ativoTicker).checked = false;
+                    return;
+                }
+    
+                // Garantir que Lsup > Linf
+                if (parseFloat(Lsup.value) <= parseFloat(Linf.value)) {
+                    alert("O Limite Superior deve ser maior que o Limite Inferior.");
+                    document.getElementById('checkbox_' + ativoTicker).checked = false;
+                    return;
+                }
+    
+                // Validação de Tempo
+                var tempoInt = parseInt(Tempo.value, 10);
+                if (isNaN(tempoInt) || tempoInt < 1) {
+                    alert("O Tempo deve ser um número inteiro maior ou igual a 1.");
+                    document.getElementById('checkbox_' + ativoTicker).checked = false;
+                    return;
+                }
+    
+                var data = new FormData();
+                data.append('codigo', ativoTicker);
+                data.append('Linf', Linf.value);
+                data.append('Lsup', Lsup.value);
+                data.append('acao', "update");
+                data.append("Tempo", Tempo.value);
+                data.append('csrfmiddlewaretoken', csrfToken.value);
+    
+                fetch(form.action, {
+                    method: 'POST',
+                    body: data
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('✅ Dados atualizados com sucesso:', data);
+                })
+                .catch(error => {
+                    console.error('❌ Erro ao atualizar os dados:', error);
+                });
+            }
+    
+            document.querySelectorAll('.Linf, .Lsup, .Tempo').forEach(input => {
+                input.addEventListener('input', function() {
+                    var ativoTicker = this.id.split('_')[1];
+    
+                    if (isCheckboxChecked(ativoTicker)) {
+                        enviarDados(ativoTicker);
+                    } else {
+                        console.log(`⚠️ Checkbox ${ativoTicker} não está marcada. Nenhum envio feito.`);
+                    }
+                });
+            });
+        });
+    </script>
+    
+
+</body>
+</html>
